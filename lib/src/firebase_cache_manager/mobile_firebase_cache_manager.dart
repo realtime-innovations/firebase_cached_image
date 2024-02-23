@@ -4,6 +4,7 @@ import 'package:firebase_cached_image/firebase_cached_image.dart';
 import 'package:firebase_cached_image/src/core/cached_object.dart';
 import 'package:firebase_cached_image/src/db_cache_manager/mobile_db_cache_manager.dart';
 import 'package:firebase_cached_image/src/firebase_cache_manager/base_firebase_cache_manager.dart';
+import 'package:firebase_cached_image/src/helper_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,7 +28,7 @@ Future<String> _getLocalDir(String _subDir) async {
 }
 
 class FirebaseCacheManager extends BaseFirebaseCacheManager {
-  FirebaseCacheManager({super.subDir})
+  FirebaseCacheManager({super.subDir, super.encryptedSecret})
       : _cacheManager = MobileDbCacheManager.init(),
         _cacheDirectoryPath = _getLocalDir(subDir ?? kDefaultImageCacheDir);
 
@@ -45,7 +46,9 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
 
     if (options.source == Source.server) {
       bytes = await firebaseUrl.ref.getData(maxSize);
-
+      if (encryptedSecret != null) {
+        bytes = decryptBytes(bytes!, encryptedSecret!);
+      }
       return CachedObject(
         id: firebaseUrl.uniqueId,
         url: firebaseUrl.url.toString(),
