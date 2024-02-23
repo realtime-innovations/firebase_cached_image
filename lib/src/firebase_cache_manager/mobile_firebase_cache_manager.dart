@@ -76,7 +76,9 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
     }
 
     bytes = await firebaseUrl.ref.getData(maxSize);
-
+    if (encryptedSecret != null) {
+      bytes = decryptBytes(bytes!, encryptedSecret!);
+    }
     final localPath = await getFullLocalPath(firebaseUrl.uniqueId);
     final cachedObject = CachedObject(
       id: firebaseUrl.uniqueId,
@@ -164,9 +166,16 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
   Future<String> _downloadToCache(
     FirebaseUrl firebaseUrl, {
     required MobileDbCacheManager manager,
+    int maxSize = 10485760,
   }) async {
+    var bytes = await firebaseUrl.ref.getData(maxSize);
+    if (encryptedSecret != null) {
+      bytes = decryptBytes(bytes!, encryptedSecret!);
+    }
+
     final localFilePath = await getFullLocalPath(firebaseUrl.uniqueId);
-    await firebaseUrl.ref.writeToFile(File(localFilePath));
+    await File(localFilePath).writeAsBytes(bytes!);
+    // await firebaseUrl.ref.writeToFile(File(localFilePath));
     await manager.put(
       CachedObject(
         id: firebaseUrl.uniqueId,

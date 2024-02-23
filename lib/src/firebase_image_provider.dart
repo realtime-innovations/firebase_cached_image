@@ -161,8 +161,10 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
         ),
       );
 
-      final cachedObject =
-          await FirebaseCacheManager(subDir: _subDir, encryptedSecret: encryptionSecret).getSingleObject(
+      final cachedObject = await FirebaseCacheManager(
+        subDir: _subDir,
+        encryptedSecret: encryptionSecret,
+      ).getSingleObject(
         firebaseUrl,
         options: options,
       );
