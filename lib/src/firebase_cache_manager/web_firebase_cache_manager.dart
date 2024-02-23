@@ -2,6 +2,7 @@ import 'package:firebase_cached_image/src/core/cache_options.dart';
 import 'package:firebase_cached_image/src/core/cached_object.dart';
 import 'package:firebase_cached_image/src/core/firebase_url.dart';
 import 'package:firebase_cached_image/src/firebase_cache_manager/base_firebase_cache_manager.dart';
+import 'package:firebase_cached_image/src/helper_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseCacheManager extends BaseFirebaseCacheManager {
@@ -35,8 +36,10 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
     CacheOptions options = const CacheOptions(),
     int maxSize = 10485760,
   }) async {
-    final bytes = await firebaseUrl.ref.getData(maxSize);
-
+    var bytes = await firebaseUrl.ref.getData(maxSize);
+    if (encryptedSecret != null) {
+      bytes = decryptBytes(bytes!, encryptedSecret!);
+    }
     return CachedObject(
       id: firebaseUrl.uniqueId,
       url: firebaseUrl.url.toString(),

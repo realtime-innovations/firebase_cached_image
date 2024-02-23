@@ -75,7 +75,9 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
     }
 
     bytes = await _cloudStorageManager.downloadLatestFile(firebaseUrl, maxSize);
-
+    if (encryptedSecret != null) {
+      bytes = decryptBytes(bytes!, encryptedSecret!);
+    }
     final cachedObject = CachedObject(
       id: firebaseUrl.uniqueId,
       url: firebaseUrl.url.toString(),
