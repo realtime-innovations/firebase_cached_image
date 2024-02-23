@@ -4,12 +4,13 @@ import 'package:firebase_cached_image/src/core/cached_object.dart';
 import 'package:firebase_cached_image/src/db_cache_manager/mobile_db_cache_manager.dart';
 import 'package:firebase_cached_image/src/firebase_cache_manager/base_firebase_cache_manager.dart';
 import 'package:firebase_cached_image/src/fs_manager/fs_manager.dart';
+import 'package:firebase_cached_image/src/helper_functions.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseCacheManager extends BaseFirebaseCacheManager {
   final String _subDir;
 
-  FirebaseCacheManager({super.subDir})
+  FirebaseCacheManager({super.subDir, super.encryptedSecret})
       : _cacheManager = MobileDbCacheManager(),
         _fs = FsManager(subDir: subDir ?? kDefaultImageCacheDir),
         _subDir = subDir ?? kDefaultImageCacheDir,
@@ -43,7 +44,9 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
     if (options.source == Source.server) {
       bytes =
           await _cloudStorageManager.downloadLatestFile(firebaseUrl, maxSize);
-
+      if (encryptedSecret != null) {
+        bytes = decryptBytes(bytes!, encryptedSecret!);
+      }
       return CachedObject(
         id: firebaseUrl.uniqueId,
         url: firebaseUrl.url.toString(),

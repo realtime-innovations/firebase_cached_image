@@ -37,6 +37,8 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
   /// ```
   final FirebaseUrl firebaseUrl;
 
+  final String? encryptionSecret;
+
   /// Use this to save files in desired directory in system's temporary directory
   ///
   /// Default: ["flutter_cached_image"]
@@ -100,6 +102,7 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
     this.options = const CacheOptions(),
     this.scale = 1.0,
     this.maxSize = 10485760,
+    this.encryptionSecret,
 
     /// Use this to save files in desired directory in system's temporary directory
     ///
@@ -159,7 +162,7 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
       );
 
       final cachedObject =
-          await FirebaseCacheManager(subDir: _subDir).getSingleObject(
+          await FirebaseCacheManager(subDir: _subDir, encryptedSecret: encryptionSecret).getSingleObject(
         firebaseUrl,
         options: options,
       );

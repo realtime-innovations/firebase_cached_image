@@ -10,7 +10,9 @@ abstract class BaseFirebaseCacheManager {
   /// Default: ["flutter_cached_image"]
   final String? subDir;
 
-  BaseFirebaseCacheManager({this.subDir});
+  final String? encryptedSecret;
+
+  BaseFirebaseCacheManager({this.subDir, this.encryptedSecret});
 
   /// Fetch, cache and returns the localFilePath for Cloud Storage File.
   ///
