@@ -162,7 +162,11 @@ class FirebaseCacheManager extends BaseFirebaseCacheManager {
   @visibleForTesting
   Future<String> downloadToCache(FirebaseUrl firebaseUrl) async {
     final file = await _fs.getFile(firebaseUrl.uniqueId);
-
+    if (encryptedSecret != null) {
+      var bytes = file.readAsBytesSync();
+      bytes = decryptBytes(bytes, encryptedSecret!);
+      file.writeAsBytesSync(bytes);
+    }
     await Future.wait([
       _cloudStorageManager.writeToFile(firebaseUrl, file),
       _cacheManager.put(
